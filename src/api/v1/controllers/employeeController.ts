@@ -18,7 +18,7 @@ export const getAllEmployees = async (
     }
 };
 
-export const getEmployeeById = async (
+export const getEmployeeById = async ( // originally did this for debugging but might as well keep it
     req: Request,
     res: Response,
     next: NextFunction
@@ -52,6 +52,23 @@ export const getEmployeesByBranch = async (
     }
 };
 
+export const getEmployeeByDepartment = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { department } = req.params;
+        const employees = await employeeService.getEmployeeByDepartment(department);
+        res.status(HTTP_STATUS.OK).json({
+            status: "Employees retrieved successfully",
+            data: employees,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const createEmployee = async (
     req: Request,
     res: Response,
@@ -59,7 +76,58 @@ export const createEmployee = async (
 ): Promise<void> => {
     try {
         const { name, position, department, email, phone, branchId } = req.body;
-        const newEmployee = await employeeService.createEmployee({ name, position, department, email, phone, branchId });
+        
+        if (!name) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee name is required"
+            });
+            return;
+        }
+        
+        if (!position) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee position is required"
+            });
+            return;
+        }
+        
+        if (!department) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee department is required"
+            });
+            return;
+        }
+        
+        if (!email) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee email is required"
+            });
+            return;
+        }
+        
+        if (!phone) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee phone is required"
+            });
+            return;
+        }
+
+        if (!branchId) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                status: "Employee branchId is required"
+            });
+            return;
+        }
+        
+        const newEmployee = await employeeService.createEmployee({ 
+            name, 
+            position, 
+            department, 
+            email, 
+            phone, 
+            branchId: parseInt(branchId)
+        });
+        
         res.status(HTTP_STATUS.CREATED).json({
             status: "Employee created successfully",
             data: newEmployee,
