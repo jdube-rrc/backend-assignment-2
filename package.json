@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jest"
+    "test": "set NODE_ENV=test && jest",
+    "start": "ts-node src/server.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
