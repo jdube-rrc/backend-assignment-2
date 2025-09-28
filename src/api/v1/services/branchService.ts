@@ -59,7 +59,7 @@ export const createBranch = async (branchData: {
  */
 export const updateBranch = async (
     id: number,
-    branchData: Pick<Branch, "name" | "address" | "phone">
+    branchData: Partial<Pick<Branch, "name" | "address" | "phone">>
 ): Promise<Branch> => {
     const index: number = branches.findIndex((branch: Branch) => branch.id === id);
 

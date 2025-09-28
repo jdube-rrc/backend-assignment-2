@@ -1,7 +1,7 @@
-import express from 'express';
+import express, { Router } from 'express';
 import * as branchController from '../controllers/branchController';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.get('/', branchController.getAllBranches);
 router.get('/:id', branchController.getBranchById);

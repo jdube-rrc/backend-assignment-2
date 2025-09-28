@@ -12,7 +12,7 @@ app.use(morgan("combined"));
 app.use("/api/v1/branches", branchRoutes);
 app.use("/api/v1/employees", employeeRoutes);
 
-app.get("/api/v1/health", (req, res) => {
+app.get("/api/v1/health", (req: express.Request, res: express.Response) => {
   res.json({
     status: "OK",
     uptime: process.uptime(),

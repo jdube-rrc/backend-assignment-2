@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
+import { Branch } from "../../../data/branches";
 import * as branchService from "../services/branchService";
 
 export const getAllBranches = async (
@@ -8,12 +9,12 @@ export const getAllBranches = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const branches = await branchService.getAllBranches();
+        const branches: Branch[] = await branchService.getAllBranches();
         res.status(HTTP_STATUS.OK).json({
             status: "Branch list retrieved successfully",
             data: branches,
         });
-    } catch (error) {
+    } catch (error: unknown) {
         next(error);
     }
 };
@@ -25,12 +26,12 @@ export const getBranchById = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const branch = await branchService.getBranchById(parseInt(id));
+        const branch: Branch = await branchService.getBranchById(parseInt(id as string));
         res.status(HTTP_STATUS.OK).json({
             status: "Branch retrieved successfully",
             data: branch,
         });
-    } catch (error) {
+    } catch (error: unknown) {
         next(error);
     }
 };
@@ -54,14 +55,14 @@ export const createBranch = async (
                 status: "Branch phone is required",
             });
         } else {
-            const { name, address, phone } = req.body;
-            const newBranch = await branchService.createBranch({ name, address, phone });
+            const { name, address, phone }: { name: string; address: string; phone: string } = req.body;
+            const newBranch: Branch = await branchService.createBranch({ name, address, phone });
             res.status(HTTP_STATUS.CREATED).json({
                 status: "Branch created successfully",
                 data: newBranch,
             });
         }
-    } catch (error) {
+    } catch (error: unknown) {
         next(error);
     }
 };
@@ -73,13 +74,13 @@ export const updateBranch = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const { name, address, phone } = req.body;
-        const updatedBranch = await branchService.updateBranch(parseInt(id), { name, address, phone });
+        const { name, address, phone }: { name?: string; address?: string; phone?: string } = req.body;
+        const updatedBranch: Branch = await branchService.updateBranch(parseInt(id as string), { name, address, phone });
         res.status(HTTP_STATUS.OK).json({
             status: "Branch updated successfully",
             data: updatedBranch,
         });
-    } catch (error) {
+    } catch (error: unknown) {
         next(error);
     }
 };
@@ -91,11 +92,11 @@ export const deleteBranch = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        await branchService.deleteBranch(parseInt(id));
+        await branchService.deleteBranch(parseInt(id as string));
         res.status(HTTP_STATUS.OK).json({
             status: "Branch deleted successfully",
         });
-    } catch (error) {
+    } catch (error: unknown) {
         next(error);
     }
 };
