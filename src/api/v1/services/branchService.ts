@@ -34,10 +34,10 @@ export const createBranch = async (branchData: {
     address: string;
     phone: string;
 }): Promise<Branch> => {
-    // Generate new ID (simple increment based on existing IDs)
+    // simple increment based on existing IDs
     const newId = Math.max(...branches.map(b => b.id)) + 1;
 
-    // Create a new branch with generated id
+    // create a new branch with generated id
     const newBranch: Branch = {
         id: newId,
         name: branchData.name,

@@ -3,6 +3,11 @@ import { HTTP_STATUS } from "../../../constants/httpConstants";
 import { Employee } from "../../../data/employees";
 import * as employeeService from "../services/employeeService";
 
+/** * Retrieves all employees
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getAllEmployees = async (
     req: Request,
     res: Response,
@@ -19,6 +24,11 @@ export const getAllEmployees = async (
     }
 };
 
+/** * Retrieves an employee by their ID
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getEmployeeById = async ( // originally did this for debugging but might as well keep it
     req: Request,
     res: Response,
@@ -36,6 +46,11 @@ export const getEmployeeById = async ( // originally did this for debugging but 
     }
 };
 
+/** * Retrieves all employees for a specific branch
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getEmployeesByBranch = async (
     req: Request,
     res: Response,
@@ -53,6 +68,11 @@ export const getEmployeesByBranch = async (
     }
 };
 
+/** * Retrieves all employees in a specific department
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getEmployeeByDepartment = async (
     req: Request,
     res: Response,
@@ -70,6 +90,11 @@ export const getEmployeeByDepartment = async (
     }
 };
 
+/** * Creates a new employee
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const createEmployee = async (
     req: Request,
     res: Response,
@@ -145,6 +170,12 @@ export const createEmployee = async (
     }
 };
 
+/**
+ * Updates an existing employee
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const updateEmployee = async (
     req: Request,
     res: Response,
@@ -177,6 +208,11 @@ export const updateEmployee = async (
     }
 };
 
+/** * Deletes an existing employee
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const deleteEmployee = async (
     req: Request,
     res: Response,

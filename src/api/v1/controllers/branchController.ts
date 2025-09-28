@@ -3,6 +3,12 @@ import { HTTP_STATUS } from "../../../constants/httpConstants";
 import { Branch } from "../../../data/branches";
 import * as branchService from "../services/branchService";
 
+/**
+ * Retrieves all branches
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getAllBranches = async (
     req: Request,
     res: Response,
@@ -19,6 +25,11 @@ export const getAllBranches = async (
     }
 };
 
+/** * Retrieves a branch by its ID
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const getBranchById = async (
     req: Request,
     res: Response,
@@ -36,6 +47,12 @@ export const getBranchById = async (
     }
 };
 
+/**
+ * Creates a new branch
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const createBranch = async (
     req: Request,
     res: Response,
@@ -67,6 +84,11 @@ export const createBranch = async (
     }
 };
 
+/** * Updates an existing branch
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const updateBranch = async (
     req: Request,
     res: Response,
@@ -85,6 +107,11 @@ export const updateBranch = async (
     }
 };
 
+/** * Deletes a branch by its ID
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function
+ */
 export const deleteBranch = async (
     req: Request,
     res: Response,
