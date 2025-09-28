@@ -1,9 +1,10 @@
-import request from "supertest";
+import request, { Response } from "supertest";
 import app from "../src/app";
+import { Employee } from "../src/data/employees";
 
 describe("Employee Routes", () => {
-    test("GET /api/v1/employees should call getAllEmployees controller", async () => {
-        const response = await request(app)
+    test("GET /api/v1/employees should call getAllEmployees controller", async (): Promise<void> => {
+        const response: Response = await request(app)
             .get("/api/v1/employees");
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("status");
@@ -11,8 +12,8 @@ describe("Employee Routes", () => {
         expect(Array.isArray(response.body.data)).toBe(true);
     });
 
-    test("GET /api/v1/employees/:id should call getEmployeeById controller", async () => {
-        const response = await request(app)
+    test("GET /api/v1/employees/:id should call getEmployeeById controller", async (): Promise<void> => {
+        const response: Response = await request(app)
             .get("/api/v1/employees/1");
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("status");
@@ -20,8 +21,8 @@ describe("Employee Routes", () => {
         expect(response.body.data).toHaveProperty("id");
     });
 
-    test("GET /api/v1/employees/branch/:branchId should call getEmployeesByBranch controller", async () => {
-        const response = await request(app)
+    test("GET /api/v1/employees/branch/:branchId should call getEmployeesByBranch controller", async (): Promise<void> => {
+        const response: Response = await request(app)
             .get("/api/v1/employees/branch/1");
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("status");
@@ -29,8 +30,8 @@ describe("Employee Routes", () => {
         expect(Array.isArray(response.body.data)).toBe(true);
     });
 
-    test("GET /api/v1/employees/department/:department should call getEmployeeByDepartment controller", async () => {
-        const response = await request(app)
+    test("GET /api/v1/employees/department/:department should call getEmployeeByDepartment controller", async (): Promise<void> => {
+        const response: Response = await request(app)
             .get("/api/v1/employees/department/Sales");
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("status");
@@ -38,8 +39,8 @@ describe("Employee Routes", () => {
         expect(Array.isArray(response.body.data)).toBe(true);
     });
     
-    test("POST /api/v1/employees should call createEmployee controller", async () => {
-        const newEmployee = {
+    test("POST /api/v1/employees should call createEmployee controller", async (): Promise<void> => {
+        const newEmployee: Omit<Employee, "id"> = {
             name: "Update Test Employee",
             position: "Test Position",
             department: "Testing",
@@ -48,17 +49,17 @@ describe("Employee Routes", () => {
             branchId: 1
         };
 
-        const createResponse = await request(app)
+        const createResponse: Response = await request(app)
             .post("/api/v1/employees")
             .send(newEmployee);
 
-        const employeeId = createResponse.body.data.id;
+        const employeeId: number = createResponse.body.data.id;
 
-        const updateData = {
+        const updateData: Partial<Omit<Employee, "id">> = {
             name: "Updated Employee Name"
         };
 
-        const response = await request(app)
+        const response: Response = await request(app)
             .put(`/api/v1/employees/${employeeId}`)
             .send(updateData);
         
@@ -68,8 +69,8 @@ describe("Employee Routes", () => {
         expect(response.body.data.name).toBe("Updated Employee Name");
     });
 
-    test("DELETE /api/v1/employees/:id should call deleteEmployee controller", async () => {
-        const newEmployee = {
+    test("DELETE /api/v1/employees/:id should call deleteEmployee controller", async (): Promise<void> => {
+        const newEmployee: Omit<Employee, "id"> = {
             name: "Delete Test Employee",
             position: "Test Position", 
             department: "Testing",
@@ -78,13 +79,13 @@ describe("Employee Routes", () => {
             branchId: 1
         };
 
-        const createResponse = await request(app)
+        const createResponse: Response = await request(app)
             .post("/api/v1/employees")
             .send(newEmployee);
 
-        const employeeId = createResponse.body.data.id;
+        const employeeId: number = createResponse.body.data.id;
 
-        const response = await request(app)
+        const response: Response = await request(app)
             .delete(`/api/v1/employees/${employeeId}`);
         
         expect(response.status).toBe(200);

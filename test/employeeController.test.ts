@@ -1,25 +1,26 @@
-import request from "supertest";
+import request, { Response } from "supertest";
 import app from "../src/app";
+import { Employee } from "../src/data/employees";
 
 describe("Employee Controller", () => {
     
     describe("getAllEmployees", () => {
-        test("should return 200 status and success message", async () => {
-            const response = await request(app)
+        test("should return 200 status and success message", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees");
             
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("Employee list retrieved successfully");
         });
 
-        test("should return all employees without validation errors", async () => {
-            const response = await request(app)
+        test("should return all employees without validation errors", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees");
             
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBeGreaterThan(0);
 
-            response.body.data.forEach((employee: any) => {
+            response.body.data.forEach((employee: Employee) => {
                 expect(employee).toHaveProperty('id');
                 expect(employee).toHaveProperty('name');
                 expect(employee).toHaveProperty('position');
@@ -32,16 +33,16 @@ describe("Employee Controller", () => {
     });
 
     describe("getEmployeeById", () => {
-        test("should return 200 status and success message for valid ID", async () => {
-            const response = await request(app)
+        test("should return 200 status and success message for valid ID", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/1");
             
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("Employee retrieved successfully");
         });
 
-        test("should return 404 status for non-existent employee ID", async () => {
-            const response = await request(app)
+        test("should return 404 status for non-existent employee ID", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/9999");
             
             expect(response.status).toBe(404);
@@ -51,16 +52,16 @@ describe("Employee Controller", () => {
     });
 
     describe("getEmployeesByBranch", () => {
-        test("should return 200 status and employees for valid branch ID", async () => {
-            const response = await request(app)
+        test("should return 200 status and employees for valid branch ID", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/branch/1");
             
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("Employees retrieved successfully");
         });
 
-        test("should return empty array for branch with no employees", async () => {
-            const response = await request(app)
+        test("should return empty array for branch with no employees", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/branch/9999");
             
             expect(response.status).toBe(200);
@@ -69,20 +70,20 @@ describe("Employee Controller", () => {
     });
 
     describe("getEmployeesByDepartment", () => {
-        test("should return 200 status and employees for valid department", async () => {
-            const response = await request(app)
+        test("should return 200 status and employees for valid department", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/department/IT");
             
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("Employees retrieved successfully");
 
-            response.body.data.forEach((employee: any) => {
+            response.body.data.forEach((employee: Employee) => {
                 expect(employee.department.toLowerCase()).toBe('it');
             });
         });
 
-        test("should return empty array for non-existent department", async () => {
-            const response = await request(app)
+        test("should return empty array for non-existent department", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .get("/api/v1/employees/department/NonExistentDept");
             
             expect(response.status).toBe(200);
@@ -91,8 +92,8 @@ describe("Employee Controller", () => {
     });
 
     describe("createEmployee", () => {
-        test("should return 201 status and success message for valid data", async () => {
-            const newEmployee = {
+        test("should return 201 status and success message for valid data", async (): Promise<void> => {
+            const newEmployee: Omit<Employee, "id"> = {
                 name: "Test Employee",
                 position: "Test Position",
                 department: "Testing",
@@ -101,7 +102,7 @@ describe("Employee Controller", () => {
                 branchId: 1
             };
 
-            const response = await request(app)
+            const response: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(newEmployee);
             
@@ -110,58 +111,58 @@ describe("Employee Controller", () => {
         });
 
         // this is so ugly but i couldn't come up with anything better
-        test("should return 400 status for missing required fields", async () => {
-            const invalidEmployee1 = {
+        test("should return 400 status for missing required fields", async (): Promise<void> => {
+            const invalidEmployee1: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee"
             };
 
-            const response1 = await request(app)
+            const response1: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee1);
             
             expect(response1.status).toBe(400);
             expect(response1.body.status).toBe("Employee position is required");
 
-            const invalidEmployee2 = {
+            const invalidEmployee2: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
                 position: "Test Position"
             };
 
-            const response2 = await request(app)
+            const response2: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee2);
             
             expect(response2.status).toBe(400);
             expect(response2.body.status).toBe("Employee department is required");
 
-            const invalidEmployee3 = {
+            const invalidEmployee3: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
                 position: "Test Position",
                 department: "Testing"
             };
 
-            const response3 = await request(app)
+            const response3: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee3);
             
             expect(response3.status).toBe(400);
             expect(response3.body.status).toBe("Employee email is required");
 
-            const invalidEmployee4 = {
+            const invalidEmployee4: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
                 position: "Test Position",
                 department: "Testing",
                 email: "test@example.com"
             };
 
-            const response4 = await request(app)
+            const response4: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee4);
             
             expect(response4.status).toBe(400);
             expect(response4.body.status).toBe("Employee phone is required");
 
-            const invalidEmployee5 = {
+            const invalidEmployee5: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
                 position: "Test Position",
                 department: "Testing",
@@ -169,14 +170,14 @@ describe("Employee Controller", () => {
                 phone: "123-4567"
             };
 
-            const response5 = await request(app)
+            const response5: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee5);
             
             expect(response5.status).toBe(400);
             expect(response5.body.status).toBe("Employee branchId is required");
 
-            const invalidEmployee6 = {
+            const invalidEmployee6: Partial<Omit<Employee, "id">> = {
                 position: "Test Position",
                 department: "Testing",
                 email: "test@example.com",
@@ -184,7 +185,7 @@ describe("Employee Controller", () => {
                 branchId: 1
             };
 
-            const response6 = await request(app)
+            const response6: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(invalidEmployee6);
             
@@ -196,8 +197,8 @@ describe("Employee Controller", () => {
     describe("updateEmployee", () => {
         let createdEmployeeId: number;
 
-        beforeEach(async () => {
-            const newEmployee = {
+        beforeEach(async (): Promise<void> => {
+            const newEmployee: Omit<Employee, "id"> = {
                 name: "Update Test Employee",
                 position: "Test Position",
                 department: "Testing",
@@ -206,20 +207,20 @@ describe("Employee Controller", () => {
                 branchId: 1
             };
 
-            const createResponse = await request(app)
+            const createResponse: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(newEmployee);
             
             createdEmployeeId = createResponse.body.data.id;
         });
 
-        test("should return 200 status and success message for valid update", async () => {
-            const updateData = {
+        test("should return 200 status and success message for valid update", async (): Promise<void> => {
+            const updateData: Partial<Omit<Employee, "id">> = {
                 name: "Updated Employee Name",
                 phone: "123-4567"
             };
 
-            const response = await request(app)
+            const response: Response = await request(app)
                 .put(`/api/v1/employees/${createdEmployeeId}`)
                 .send(updateData);
             
@@ -227,12 +228,12 @@ describe("Employee Controller", () => {
             expect(response.body.status).toBe("Employee updated successfully");
         });
 
-        test("should return 404 status for non-existent employee ID", async () => {
-            const updateData = {
+        test("should return 404 status for non-existent employee ID", async (): Promise<void> => {
+            const updateData: Partial<Omit<Employee, "id">> = {
                 name: "Updated Employee Name"
             };
 
-            const response = await request(app)
+            const response: Response = await request(app)
                 .put("/api/v1/employees/9999")
                 .send(updateData);
             
@@ -245,8 +246,8 @@ describe("Employee Controller", () => {
     describe("deleteEmployee", () => {
         let createdEmployeeId: number;
 
-        beforeEach(async () => {
-            const newEmployee = {
+        beforeEach(async (): Promise<void> => {
+            const newEmployee: Omit<Employee, "id"> = {
                 name: "Delete Test Employee",
                 position: "Test Position",
                 department: "Testing",
@@ -255,27 +256,27 @@ describe("Employee Controller", () => {
                 branchId: 1
             };
 
-            const createResponse = await request(app)
+            const createResponse: Response = await request(app)
                 .post("/api/v1/employees")
                 .send(newEmployee);
             
             createdEmployeeId = createResponse.body.data.id;
         });
 
-        test("should return 200 status and success message for valid deletion", async () => {
-            const response = await request(app)
+        test("should return 200 status and success message for valid deletion", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .delete(`/api/v1/employees/${createdEmployeeId}`);
             
             expect(response.status).toBe(200);
             expect(response.body.status).toBe("Employee deleted successfully");
 
-            const getResponse = await request(app)
+            const getResponse: Response = await request(app)
                 .get(`/api/v1/employees/${createdEmployeeId}`);
             expect(getResponse.status).toBe(404);
         });
 
-        test("should return 404 status for non-existent employee ID", async () => {
-            const response = await request(app)
+        test("should return 404 status for non-existent employee ID", async (): Promise<void> => {
+            const response: Response = await request(app)
                 .delete("/api/v1/employees/9999");
             
             expect(response.status).toBe(404);
