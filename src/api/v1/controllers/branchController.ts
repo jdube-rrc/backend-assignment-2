@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
-import { Branch } from "../../../data/branches";
+import { Branch } from "../models/branchModel";
+import { successResponse, errorResponse } from "../models/responseModel";
 import * as branchService from "../services/branchService";
 
 /**
@@ -16,10 +17,9 @@ export const getAllBranches = async (
 ): Promise<void> => {
     try {
         const branches: Branch[] = await branchService.getAllBranches();
-        res.status(HTTP_STATUS.OK).json({
-            status: "Branch list retrieved successfully",
-            data: branches,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(branches, "Branch list retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -38,10 +38,9 @@ export const getBranchById = async (
     try {
         const { id } = req.params;
         const branch: Branch = await branchService.getBranchById(parseInt(id as string));
-        res.status(HTTP_STATUS.OK).json({
-            status: "Branch retrieved successfully",
-            data: branch,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(branch, "Branch retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -59,26 +58,12 @@ export const createBranch = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        if (!req.body.name) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Branch name is required",
-            });
-        } else if (!req.body.address) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Branch address is required",
-            });
-        } else if (!req.body.phone) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Branch phone is required",
-            });
-        } else {
-            const { name, address, phone }: { name: string; address: string; phone: string } = req.body;
-            const newBranch: Branch = await branchService.createBranch({ name, address, phone });
-            res.status(HTTP_STATUS.CREATED).json({
-                status: "Branch created successfully",
-                data: newBranch,
-            });
-        }
+        // Validation middleware has already validated the data
+        const { name, address, phone }: { name: string; address: string; phone: string } = req.body;
+        const newBranch: Branch = await branchService.createBranch({ name, address, phone });
+        res.status(HTTP_STATUS.CREATED).json(
+            successResponse(newBranch, "Branch created successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -98,10 +83,9 @@ export const updateBranch = async (
         const { id } = req.params;
         const { name, address, phone }: { name?: string; address?: string; phone?: string } = req.body;
         const updatedBranch: Branch = await branchService.updateBranch(parseInt(id as string), { name, address, phone });
-        res.status(HTTP_STATUS.OK).json({
-            status: "Branch updated successfully",
-            data: updatedBranch,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(updatedBranch, "Branch updated successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -120,9 +104,9 @@ export const deleteBranch = async (
     try {
         const { id } = req.params;
         await branchService.deleteBranch(parseInt(id as string));
-        res.status(HTTP_STATUS.OK).json({
-            status: "Branch deleted successfully",
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(null, "Branch deleted successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
