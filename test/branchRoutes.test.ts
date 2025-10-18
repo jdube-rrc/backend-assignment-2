@@ -83,6 +83,7 @@ describe("Branch Routes", () => {
         
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("status");
-        expect(response.body.status).toContain("deleted successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toContain("deleted successfully");
     });
 });
