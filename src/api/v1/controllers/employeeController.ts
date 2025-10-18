@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
-import { Employee } from "../../../data/employees";
+import { Employee } from "../models/employeeModel";
+import { successResponse, errorResponse } from "../models/responseModel";
 import * as employeeService from "../services/employeeService";
 
 /** * Retrieves all employees
@@ -15,10 +16,9 @@ export const getAllEmployees = async (
 ): Promise<void> => {
     try {
         const employees: Employee[] = await employeeService.getAllEmployees();
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employee list retrieved successfully",
-            data: employees,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(employees, "Employee list retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -37,10 +37,9 @@ export const getEmployeeById = async ( // originally did this for debugging but 
     try {
         const { id } = req.params;
         const employee: Employee = await employeeService.getEmployeeById(parseInt(id as string));
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employee retrieved successfully",
-            data: employee,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(employee, "Employee retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -59,10 +58,9 @@ export const getEmployeesByBranch = async (
     try {
         const { id } = req.params;
         const employees: Employee[] = await employeeService.getEmployeesByBranch(parseInt(id as string));
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employees retrieved successfully",
-            data: employees,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(employees, "Employees retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -81,10 +79,9 @@ export const getEmployeeByDepartment = async (
     try {
         const { department } = req.params;
         const employees: Employee[] = await employeeService.getEmployeeByDepartment(department as string);
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employees retrieved successfully",
-            data: employees,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(employees, "Employees retrieved successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -101,6 +98,7 @@ export const createEmployee = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        // Validation middleware has already validated the data
         const { name, position, department, email, phone, branchId }: {
             name: string;
             position: string;
@@ -109,48 +107,6 @@ export const createEmployee = async (
             phone: string;
             branchId: number;
         } = req.body;
-        
-        if (!name) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee name is required"
-            });
-            return;
-        }
-        
-        if (!position) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee position is required"
-            });
-            return;
-        }
-        
-        if (!department) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee department is required"
-            });
-            return;
-        }
-        
-        if (!email) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee email is required"
-            });
-            return;
-        }
-        
-        if (!phone) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee phone is required"
-            });
-            return;
-        }
-
-        if (!branchId) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json({
-                status: "Employee branchId is required"
-            });
-            return;
-        }
         
         const newEmployee: Employee = await employeeService.createEmployee({ 
             name, 
@@ -161,10 +117,9 @@ export const createEmployee = async (
             branchId: parseInt(branchId.toString())
         });
         
-        res.status(HTTP_STATUS.CREATED).json({
-            status: "Employee created successfully",
-            data: newEmployee,
-        });
+        res.status(HTTP_STATUS.CREATED).json(
+            successResponse(newEmployee, "Employee created successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -199,10 +154,9 @@ export const updateEmployee = async (
             phone, 
             branchId: branchId ? parseInt(branchId.toString()) : undefined
         });
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employee updated successfully",
-            data: updatedEmployee,
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(updatedEmployee, "Employee updated successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
@@ -221,9 +175,9 @@ export const deleteEmployee = async (
     try {
         const { id } = req.params;
         await employeeService.deleteEmployee(parseInt(id as string));
-        res.status(HTTP_STATUS.OK).json({
-            status: "Employee deleted successfully",
-        });
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(null, "Employee deleted successfully")
+        );
     } catch (error: unknown) {
         next(error);
     }
