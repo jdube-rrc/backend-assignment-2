@@ -40,7 +40,7 @@ export const getEmployeesByBranch = async (branchId: number): Promise<Employee[]
  */
 export const getEmployeeByDepartment = async (department: string): Promise<Employee[]> => {
     const departmentEmployees = employees.filter((e: Employee) => 
-        e.department.toLowerCase() === department.toLowerCase()
+        e.department && e.department.toLowerCase() === department.toLowerCase()
 );
     return structuredClone(departmentEmployees);
 };
