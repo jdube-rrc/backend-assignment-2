@@ -10,7 +10,8 @@ describe("Employee Controller", () => {
                 .get("/api/v1/employees");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employee list retrieved successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employee list retrieved successfully");
         });
 
         test("should return all employees without validation errors", async (): Promise<void> => {
@@ -38,7 +39,8 @@ describe("Employee Controller", () => {
                 .get("/api/v1/employees/1");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employee retrieved successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employee retrieved successfully");
         });
 
         test("should return 404 status for non-existent employee ID", async (): Promise<void> => {
@@ -57,7 +59,8 @@ describe("Employee Controller", () => {
                 .get("/api/v1/employees/branch/1");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employees retrieved successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employees retrieved successfully");
         });
 
         test("should return empty array for branch with no employees", async (): Promise<void> => {
@@ -75,7 +78,8 @@ describe("Employee Controller", () => {
                 .get("/api/v1/employees/department/IT");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employees retrieved successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employees retrieved successfully");
 
             response.body.data.forEach((employee: Employee) => {
                 expect(employee.department.toLowerCase()).toBe('it');
@@ -107,7 +111,8 @@ describe("Employee Controller", () => {
                 .send(newEmployee);
             
             expect(response.status).toBe(201);
-            expect(response.body.status).toBe("Employee created successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employee created successfully");
         });
 
         // this is so ugly but i couldn't come up with anything better
@@ -121,7 +126,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee1);
             
             expect(response1.status).toBe(400);
-            expect(response1.body.status).toBe("Employee position is required");
+            expect(response1.body.error).toContain("Position is required");
 
             const invalidEmployee2: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
@@ -133,7 +138,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee2);
             
             expect(response2.status).toBe(400);
-            expect(response2.body.status).toBe("Employee department is required");
+            expect(response2.body.error).toContain("Department is required");
 
             const invalidEmployee3: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
@@ -146,7 +151,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee3);
             
             expect(response3.status).toBe(400);
-            expect(response3.body.status).toBe("Employee email is required");
+            expect(response3.body.error).toContain("Email is required");
 
             const invalidEmployee4: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
@@ -160,7 +165,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee4);
             
             expect(response4.status).toBe(400);
-            expect(response4.body.status).toBe("Employee phone is required");
+            expect(response4.body.error).toContain("Phone is required");
 
             const invalidEmployee5: Partial<Omit<Employee, "id">> = {
                 name: "Test Employee",
@@ -175,7 +180,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee5);
             
             expect(response5.status).toBe(400);
-            expect(response5.body.status).toBe("Employee branchId is required");
+            expect(response5.body.error).toContain("branchId is required");
 
             const invalidEmployee6: Partial<Omit<Employee, "id">> = {
                 position: "Test Position",
@@ -190,7 +195,7 @@ describe("Employee Controller", () => {
                 .send(invalidEmployee6);
             
             expect(response6.status).toBe(400);
-            expect(response6.body.status).toBe("Employee name is required");
+            expect(response6.body.error).toContain("Name is required");
         });
     });
 
@@ -225,7 +230,8 @@ describe("Employee Controller", () => {
                 .send(updateData);
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employee updated successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employee updated successfully");
         });
 
         test("should return 404 status for non-existent employee ID", async (): Promise<void> => {
@@ -268,7 +274,8 @@ describe("Employee Controller", () => {
                 .delete(`/api/v1/employees/${createdEmployeeId}`);
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Employee deleted successfully");
+                expect(response.body.status).toBe("success");
+                expect(response.body.message).toBe("Employee deleted successfully");
 
             const getResponse: Response = await request(app)
                 .get(`/api/v1/employees/${createdEmployeeId}`);

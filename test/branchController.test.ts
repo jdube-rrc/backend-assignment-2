@@ -10,7 +10,8 @@ describe("Branch Controller", () => {
                 .get("/api/v1/branches");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Branch list retrieved successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toBe("Branch list retrieved successfully");
         });
 
         test("should return all branches without validation errors", async (): Promise<void> => {
@@ -34,7 +35,8 @@ describe("Branch Controller", () => {
                 .get("/api/v1/branches/1");
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Branch retrieved successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toBe("Branch retrieved successfully");
         });
 
         test("should return 404 status for non-existent branch ID", async (): Promise<void> => {
@@ -60,7 +62,8 @@ describe("Branch Controller", () => {
                 .send(newBranch);
             
             expect(response.status).toBe(201);
-            expect(response.body.status).toBe("Branch created successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toBe("Branch created successfully");
         });
 
         test("should return 400 status for missing required fields", async (): Promise<void> => {
@@ -74,7 +77,7 @@ describe("Branch Controller", () => {
                 .send(invalidBranch1);
             
             expect(response1.status).toBe(400);
-            expect(response1.body.status).toBe("Branch name is required");
+            expect(response1.body.error).toContain("Name is required");
 
             // Test missing address
             const invalidBranch2: Partial<Omit<Branch, "id">> = {
@@ -87,7 +90,7 @@ describe("Branch Controller", () => {
                 .send(invalidBranch2);
             
             expect(response2.status).toBe(400);
-            expect(response2.body.status).toBe("Branch address is required");
+            expect(response2.body.error).toContain("Address is required");
 
             // Test missing phone
             const invalidBranch3: Partial<Omit<Branch, "id">> = {
@@ -100,7 +103,7 @@ describe("Branch Controller", () => {
                 .send(invalidBranch3);
             
             expect(response3.status).toBe(400);
-            expect(response3.body.status).toBe("Branch phone is required");
+            expect(response3.body.error).toContain("Phone is required");
         });
     });
 
@@ -133,7 +136,8 @@ describe("Branch Controller", () => {
                 .send(updateData);
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Branch updated successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toBe("Branch updated successfully");
         });
 
         test("should return 404 status for non-existent branch ID", async (): Promise<void> => {
@@ -173,7 +177,8 @@ describe("Branch Controller", () => {
                 .delete(`/api/v1/branches/${createdBranchId}`);
             
             expect(response.status).toBe(200);
-            expect(response.body.status).toBe("Branch deleted successfully");
+            expect(response.body.status).toBe("success");
+            expect(response.body.message).toBe("Branch deleted successfully");
 
             const getResponse: Response = await request(app)
                 .get(`/api/v1/branches/${createdBranchId}`);
