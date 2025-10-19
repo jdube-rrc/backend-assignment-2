@@ -15,7 +15,7 @@ export const getAllBranches = async (): Promise<Branch[]> => {
  * @throws Error if branch with given ID is not found
  */
 export const getBranchById = async (id: number): Promise<Branch> => {
-    const branch = branches.find((b: Branch) => b.id === id);
+    const branch: Branch | undefined = branches.find((b: Branch) => b.id === id);
 
     if (!branch) {
         throw new Error(`Branch with ID ${id} not found`);
@@ -35,7 +35,7 @@ export const createBranch = async (branchData: {
     phone: string;
 }): Promise<Branch> => {
     // simple increment based on existing IDs
-    const newId = Math.max(...branches.map(b => b.id)) + 1;
+    const newId: number = Math.max(...branches.map(b => b.id)) + 1;
 
     // create a new branch with generated id
     const newBranch: Branch = {

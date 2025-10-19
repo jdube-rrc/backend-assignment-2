@@ -3,9 +3,9 @@ import { HTTP_STATUS } from '../constants/httpConstants';
 
 export const errorHandler = (
     error: unknown,
-    req: Request,
+    _req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ): void => {
     const errorMessage: string = error instanceof Error ? error.message : 'Unknown error';
     

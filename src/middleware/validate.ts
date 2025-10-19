@@ -30,7 +30,7 @@ export const validateRequest = (
     const STRIP_QUERY: boolean = false;
 
     // returns a Middleware Function
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
         try {
             const errors: string[] = [];
 
@@ -42,12 +42,12 @@ export const validateRequest = (
              * @param shouldStripFields - Whether to strip unknown fields from the validated data
              * @returns The original data if validation fails or stripping id disabled, otherwise the stripped/validated data
              */
-            const validateRequestSection = (
+            const validateRequestSection = <T>(
                 validationSchema: ObjectSchema,
-                requestData: unknown,
+                requestData: T,
                 requestSectionName: string,
                 shouldStripFields: boolean
-            ) => {
+            ): T => {
                 // abortEarly false means continue validation even if something fails validation
                 const { error, value: strippedFields } =
                     validationSchema.validate(requestData, {
@@ -63,7 +63,7 @@ export const validateRequest = (
                         )
                     );
                 } else if (shouldStripFields) {
-                    return strippedFields;
+                    return strippedFields as T;
                 }
 
                 return requestData;
@@ -97,15 +97,20 @@ export const validateRequest = (
                 );
             }
 
-            // If there are any validation erros, return them
+            // If there are any validation errors, return them
             if (errors.length > 0) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                res.status(HTTP_STATUS.BAD_REQUEST).json({
                     error: `Validation error: ${errors.join(", ")}`,
                 });
+                return;
             }
 
             next();
         } catch (error: unknown) {
+            if (process.env.NODE_ENV !== 'test') {
+                const errMsg: string = error instanceof Error ? error.message : String(error);
+                console.error('Validation middleware error:', errMsg);
+            }
             res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: "Error occurred during validation",
             });

@@ -15,7 +15,7 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
  * @throws Error if employee with given ID is not found
  */
 export const getEmployeeById = async (id: number): Promise<Employee> => {
-    const employee = employees.find((e: Employee) => e.id === id);
+    const employee: Employee | undefined = employees.find((e: Employee) => e.id === id);
 
     if (!employee) {
         throw new Error(`Employee with ID ${id} not found`);
@@ -30,7 +30,7 @@ export const getEmployeeById = async (id: number): Promise<Employee> => {
  * @returns Array of employees in the specified branch
  */
 export const getEmployeesByBranch = async (branchId: number): Promise<Employee[]> => {
-    const branchEmployees = employees.filter((e: Employee) => e.branchId === branchId);
+    const branchEmployees: Employee[] = employees.filter((e: Employee) => e.branchId === branchId);
     return structuredClone(branchEmployees);
 };
 
@@ -39,7 +39,7 @@ export const getEmployeesByBranch = async (branchId: number): Promise<Employee[]
  * @returns Array of employees in the specified department
  */
 export const getEmployeeByDepartment = async (department: string): Promise<Employee[]> => {
-    const departmentEmployees = employees.filter((e: Employee) => 
+    const departmentEmployees: Employee[] = employees.filter((e: Employee) => 
         e.department && e.department.toLowerCase() === department.toLowerCase()
 );
     return structuredClone(departmentEmployees);
@@ -59,7 +59,7 @@ export const createEmployee = async (employeeData: {
     branchId: number;
 }): Promise<Employee> => {
 
-    const newId = Math.max(...employees.map(e => e.id)) + 1; // just here to ensure a unique ID is generated
+    const newId: number = Math.max(...employees.map(e => e.id)) + 1; // just here to ensure a unique ID is generated
     const newEmployee: Employee = {
         id: newId,
         name: employeeData.name,
