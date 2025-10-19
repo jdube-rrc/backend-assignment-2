@@ -1,52 +1,102 @@
-import { employees, Employee } from "../../../data/employees";
+import { Employee } from "../../../data/employees";
+import * as firestoreRepo from "../repositories/firestoreRepository";
+
+const COLLECTION_NAME: string = "employees";
 
 /**
- * Retrieves all employees from storage
+ * Retrieves all employees from Firestore
  * @returns Array of all employees
  */
 export const getAllEmployees = async (): Promise<Employee[]> => {
-    return structuredClone(employees);
+    try {
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocuments(COLLECTION_NAME);
+        const employees: Employee[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): Employee => ({
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Employee, "id">)
+        }));
+        return employees;
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve employees: ${errorMessage}`);
+    }
 };
 
 /**
- * Retrieves a single employee by ID
+ * Retrieves a single employee by ID from Firestore
  * @param id - The ID of the employee to retrieve
  * @returns The employee with the given ID
  * @throws Error if employee with given ID is not found
  */
 export const getEmployeeById = async (id: number): Promise<Employee> => {
-    const employee: Employee | undefined = employees.find((e: Employee) => e.id === id);
+    try {
+        const doc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (!employee) {
-        throw new Error(`Employee with ID ${id} not found`);
+        if (!doc || !doc.exists) {
+            throw new Error(`Employee with ID ${id} not found`);
+        }
+
+        return {
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Employee, "id">)
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve employee ${id}: ${errorMessage}`);
     }
-
-    return structuredClone(employee);
 };
 
 /**
- * Retrieves all employees for a specific branch
+ * Retrieves all employees for a specific branch from Firestore
  * @param branchId - The ID of the branch to get employees for
  * @returns Array of employees in the specified branch
  */
 export const getEmployeesByBranch = async (branchId: number): Promise<Employee[]> => {
-    const branchEmployees: Employee[] = employees.filter((e: Employee) => e.branchId === branchId);
-    return structuredClone(branchEmployees);
+    try {
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocumentsByFieldValues(
+            COLLECTION_NAME,
+            [{ fieldName: "branchId", fieldValue: branchId }]
+        );
+        
+        const branchEmployees: Employee[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): Employee => ({
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Employee, "id">)
+        }));
+        
+        return branchEmployees;
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve employees for branch ${branchId}: ${errorMessage}`);
+    }
 };
 
-/** * Retrieves all employees in a specific department
+/** * Retrieves all employees in a specific department from Firestore
  * @param department - The department to get employees for
  * @returns Array of employees in the specified department
  */
 export const getEmployeeByDepartment = async (department: string): Promise<Employee[]> => {
-    const departmentEmployees: Employee[] = employees.filter((e: Employee) => 
-        e.department && e.department.toLowerCase() === department.toLowerCase()
-);
-    return structuredClone(departmentEmployees);
+    try {
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocumentsByFieldValues(
+            COLLECTION_NAME,
+            [{ fieldName: "department", fieldValue: department }]
+        );
+        
+        const departmentEmployees: Employee[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): Employee => ({
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Employee, "id">)
+        }));
+        
+        return departmentEmployees;
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve employees for department ${department}: ${errorMessage}`);
+    }
 };
 
 /**
- * Creates a new employee
+ * Creates a new employee in Firestore
  * @param employeeData - The data for the new employee
  * @returns The created employee with generated ID
  */
@@ -58,25 +108,43 @@ export const createEmployee = async (employeeData: {
     phone: string;
     branchId: number;
 }): Promise<Employee> => {
+    try {
+        // Get all existing employees to calculate next ID
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocuments(COLLECTION_NAME);
+        const existingIds: number[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): number => 
+            parseInt(doc.id, 10)
+        );
+        const newId: number = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
 
-    const newId: number = Math.max(...employees.map(e => e.id)) + 1; // just here to ensure a unique ID is generated
-    const newEmployee: Employee = {
-        id: newId,
-        name: employeeData.name,
-        position: employeeData.position,
-        department: employeeData.department,
-        email: employeeData.email,
-        phone: employeeData.phone,
-        branchId: employeeData.branchId,
-    };
+        // Create the employee data without the id
+        const employeeToCreate: Omit<Employee, "id"> = {
+            name: employeeData.name,
+            position: employeeData.position,
+            department: employeeData.department,
+            email: employeeData.email,
+            phone: employeeData.phone,
+            branchId: employeeData.branchId,
+        };
 
-    employees.push(newEmployee);
+        // Create document with the calculated ID
+        await firestoreRepo.createDocument<Omit<Employee, "id">>(
+            COLLECTION_NAME,
+            employeeToCreate,
+            newId.toString()
+        );
 
-    return structuredClone(newEmployee);
+        return {
+            id: newId,
+            ...employeeToCreate
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to create employee: ${errorMessage}`);
+    }
 };
 
 /**
- * Updates (replaces) an existing employee
+ * Updates an existing employee in Firestore
  * @param id - The ID of the employee to update
  * @param employeeData - The fields to update
  * @returns The updated employee
@@ -84,34 +152,67 @@ export const createEmployee = async (employeeData: {
  */
 export const updateEmployee = async (
     id: number,
-    employeeData: Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">> // was having a weird error with Pick<Employee, ...> alone
+    employeeData: Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">>
 ): Promise<Employee> => {
-    const index: number = employees.findIndex((employee: Employee) => employee.id === id);
+    try {
+        // Check if employee exists
+        const existingDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (index === -1) {
-        throw new Error(`Employee with ID ${id} not found`);
+        if (!existingDoc || !existingDoc.exists) {
+            throw new Error(`Employee with ID ${id} not found`);
+        }
+
+        // Update the document
+        await firestoreRepo.updateDocument<Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">>>(
+            COLLECTION_NAME,
+            id.toString(),
+            employeeData
+        );
+
+        // Retrieve and return updated employee
+        const updatedDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
+
+        if (!updatedDoc || !updatedDoc.exists) {
+            throw new Error(`Failed to retrieve updated employee ${id}`);
+        }
+
+        return {
+            id: parseInt(updatedDoc.id, 10),
+            ...(updatedDoc.data() as Omit<Employee, "id">)
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to update employee ${id}: ${errorMessage}`);
     }
-
-    // ensure partial updates still work
-    employees[index] = {
-        ...employees[index],
-        ...employeeData,
-    };
-
-    return structuredClone(employees[index]);
 };
 
 /**
- * Deletes an employee from storage
+ * Deletes an employee from Firestore
  * @param id - The ID of the employee to delete
  * @throws Error if employee with given ID is not found
  */
 export const deleteEmployee = async (id: number): Promise<void> => {
-    const index: number = employees.findIndex((employee: Employee) => employee.id === id);
+    try {
+        // Check if employee exists
+        const existingDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (index === -1) {
-        throw new Error(`Employee with ID ${id} not found`);
+        if (!existingDoc || !existingDoc.exists) {
+            throw new Error(`Employee with ID ${id} not found`);
+        }
+
+        // Delete the document
+        await firestoreRepo.deleteDocument(COLLECTION_NAME, id.toString());
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to delete employee ${id}: ${errorMessage}`);
     }
-
-    employees.splice(index, 1);
 };

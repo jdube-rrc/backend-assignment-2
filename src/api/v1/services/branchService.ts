@@ -1,31 +1,55 @@
-import { branches, Branch } from "../../../data/branches";
+import { Branch } from "../../../data/branches";
+import * as firestoreRepo from "../repositories/firestoreRepository";
+
+const COLLECTION_NAME: string = "branches";
 
 /**
- * Retrieves all branches from storage
+ * Retrieves all branches from Firestore
  * @returns Array of all branches
  */
 export const getAllBranches = async (): Promise<Branch[]> => {
-    return structuredClone(branches);
+    try {
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocuments(COLLECTION_NAME);
+        const branches: Branch[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): Branch => ({
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Branch, "id">)
+        }));
+        return branches;
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve branches: ${errorMessage}`);
+    }
 };
 
 /**
- * Retrieves a single branch by ID
+ * Retrieves a single branch by ID from Firestore
  * @param id - The ID of the branch to retrieve
  * @returns The branch with the given ID
  * @throws Error if branch with given ID is not found
  */
 export const getBranchById = async (id: number): Promise<Branch> => {
-    const branch: Branch | undefined = branches.find((b: Branch) => b.id === id);
+    try {
+        const doc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (!branch) {
-        throw new Error(`Branch with ID ${id} not found`);
+        if (!doc || !doc.exists) {
+            throw new Error(`Branch with ID ${id} not found`);
+        }
+
+        return {
+            id: parseInt(doc.id, 10),
+            ...(doc.data() as Omit<Branch, "id">)
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to retrieve branch ${id}: ${errorMessage}`);
     }
-
-    return structuredClone(branch);
 };
 
 /**
- * Creates a new branch
+ * Creates a new branch in Firestore
  * @param branchData - The data for the new branch (name, address, and phone)
  * @returns The created branch with generated ID
  */
@@ -34,24 +58,40 @@ export const createBranch = async (branchData: {
     address: string;
     phone: string;
 }): Promise<Branch> => {
-    // simple increment based on existing IDs
-    const newId: number = Math.max(...branches.map(b => b.id)) + 1;
+    try {
+        // Get all existing branches to calculate next ID
+        const snapshot: FirebaseFirestore.QuerySnapshot = await firestoreRepo.getDocuments(COLLECTION_NAME);
+        const existingIds: number[] = snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot): number => 
+            parseInt(doc.id, 10)
+        );
+        const newId: number = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
 
-    // create a new branch with generated id
-    const newBranch: Branch = {
-        id: newId,
-        name: branchData.name,
-        address: branchData.address,
-        phone: branchData.phone,
-    };
+        // Create the branch data without the id
+        const branchToCreate: Omit<Branch, "id"> = {
+            name: branchData.name,
+            address: branchData.address,
+            phone: branchData.phone,
+        };
 
-    branches.push(newBranch);
+        // Create document with the calculated ID
+        await firestoreRepo.createDocument<Omit<Branch, "id">>(
+            COLLECTION_NAME,
+            branchToCreate,
+            newId.toString()
+        );
 
-    return structuredClone(newBranch);
+        return {
+            id: newId,
+            ...branchToCreate
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to create branch: ${errorMessage}`);
+    }
 };
 
 /**
- * Updates (replaces) an existing branch
+ * Updates an existing branch in Firestore
  * @param id - The ID of the branch to update
  * @param branchData - The fields to update (name, address, and/or phone)
  * @returns The updated branch
@@ -61,32 +101,66 @@ export const updateBranch = async (
     id: number,
     branchData: Partial<Pick<Branch, "name" | "address" | "phone">>
 ): Promise<Branch> => {
-    const index: number = branches.findIndex((branch: Branch) => branch.id === id);
+    try {
+        // Check if branch exists
+        const existingDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (index === -1) {
-        throw new Error(`Branch with ID ${id} not found`);
+        if (!existingDoc || !existingDoc.exists) {
+            throw new Error(`Branch with ID ${id} not found`);
+        }
+
+        // Update the document
+        await firestoreRepo.updateDocument<Partial<Pick<Branch, "name" | "address" | "phone">>>(
+            COLLECTION_NAME,
+            id.toString(),
+            branchData
+        );
+
+        // Retrieve and return updated branch
+        const updatedDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
+
+        if (!updatedDoc || !updatedDoc.exists) {
+            throw new Error(`Failed to retrieve updated branch ${id}`);
+        }
+
+        return {
+            id: parseInt(updatedDoc.id, 10),
+            ...(updatedDoc.data() as Omit<Branch, "id">)
+        };
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to update branch ${id}: ${errorMessage}`);
     }
-
-    branches[index] = {
-        ...branches[index],
-        ...branchData,
-    };
-
-    return structuredClone(branches[index]);
 };
 
 /**
- * Deletes a branch from storage
+ * Deletes a branch from Firestore
  * @param id - The ID of the branch to delete
  * @throws Error if branch with given ID is not found
  */
 export const deleteBranch = async (id: number): Promise<void> => {
-    const index: number = branches.findIndex((branch: Branch) => branch.id === id);
+    try {
+        // Check if branch exists
+        const existingDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
+            COLLECTION_NAME,
+            id.toString()
+        );
 
-    if (index === -1) {
-        throw new Error(`Branch with ID ${id} not found`);
+        if (!existingDoc || !existingDoc.exists) {
+            throw new Error(`Branch with ID ${id} not found`);
+        }
+
+        // Delete the document
+        await firestoreRepo.deleteDocument(COLLECTION_NAME, id.toString());
+    } catch (error: unknown) {
+        const errorMessage: string = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to delete branch ${id}: ${errorMessage}`);
     }
-
-    branches.splice(index, 1);
 };
 
