@@ -2,7 +2,7 @@ import request, { Response } from "supertest";
 import app from "../src/app";
 import { Employee } from "../src/data/employees";
 
-describe("Employee Routes", () => {
+describe("Employee Routes", (): void => {
     test("GET /api/v1/employees should call getAllEmployees controller", async (): Promise<void> => {
         const response: Response = await request(app)
             .get("/api/v1/employees");

@@ -2,9 +2,9 @@ import request, { Response } from "supertest";
 import app from "../src/app";
 import { Employee } from "../src/data/employees";
 
-describe("Employee Controller", () => {
+describe("Employee Controller", (): void => {
     
-    describe("getAllEmployees", () => {
+    describe("getAllEmployees", (): void => {
         test("should return 200 status and success message", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/employees");
@@ -33,7 +33,7 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("getEmployeeById", () => {
+    describe("getEmployeeById", (): void => {
         test("should return 200 status and success message for valid ID", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/employees/1");
@@ -53,7 +53,7 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("getEmployeesByBranch", () => {
+    describe("getEmployeesByBranch", (): void => {
         test("should return 200 status and employees for valid branch ID", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/employees/branch/1");
@@ -72,8 +72,8 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("getEmployeesByDepartment", () => {
-        test("should return 200 status and employees for valid department", async (): Promise<void> => {
+    describe("getEmployeesByDepartment", (): void => {
+        test("should return 200 status and success message for valid department", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/employees/department/IT");
             
@@ -95,7 +95,7 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("createEmployee", () => {
+    describe("createEmployee", (): void => {
         test("should return 201 status and success message for valid data", async (): Promise<void> => {
             const newEmployee: Omit<Employee, "id"> = {
                 name: "Test Employee",
@@ -199,7 +199,7 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("updateEmployee", () => {
+    describe("updateEmployee", (): void => {
         let createdEmployeeId: number;
 
         beforeEach(async (): Promise<void> => {
@@ -249,7 +249,7 @@ describe("Employee Controller", () => {
         });
     });
 
-    describe("deleteEmployee", () => {
+    describe("deleteEmployee", (): void => {
         let createdEmployeeId: number;
 
         beforeEach(async (): Promise<void> => {

@@ -1,10 +1,19 @@
 import request, { Response } from "supertest";
 import app from "../src/app";
 
-describe("Employee Validation Tests", () => {
-    describe("POST /api/v1/employees - Create Employee Validation", () => {
+type ValidEmployeeData = {
+    name: string;
+    position: string;
+    department: string;
+    email: string;
+    phone: string;
+    branchId: number;
+};
+
+describe("Employee Validation Tests", (): void => {
+    describe("POST /api/v1/employees - Create Employee Validation", (): void => {
         test("should accept valid employee data", async (): Promise<void> => {
-            const validEmployee = {
+            const validEmployee: ValidEmployeeData = {
                 name: "John Doe",
                 position: "Software Engineer",
                 department: "Engineering",
@@ -23,7 +32,7 @@ describe("Employee Validation Tests", () => {
         });
 
         test("should reject when name is missing", async (): Promise<void> => {
-            const invalidEmployee = {
+            const invalidEmployee: Omit<ValidEmployeeData, "name"> = {
                 position: "Software Engineer",
                 department: "Engineering",
                 email: "john.doe@example.com",
@@ -40,7 +49,7 @@ describe("Employee Validation Tests", () => {
         });
 
         test("should reject when name is too short (< 2 characters)", async (): Promise<void> => {
-            const invalidEmployee = {
+            const invalidEmployee: ValidEmployeeData = {
                 name: "J",
                 position: "Software Engineer",
                 department: "Engineering",
@@ -58,7 +67,7 @@ describe("Employee Validation Tests", () => {
         });
 
         test("should reject when name is too long (> 100 characters)", async (): Promise<void> => {
-            const invalidEmployee = {
+            const invalidEmployee: ValidEmployeeData = {
                 name: "A".repeat(101),
                 position: "Software Engineer",
                 department: "Engineering",
@@ -76,7 +85,7 @@ describe("Employee Validation Tests", () => {
         });
 
         test("should reject when position is missing", async (): Promise<void> => {
-            const invalidEmployee = {
+            const invalidEmployee: Omit<ValidEmployeeData, "position"> = {
                 name: "John Doe",
                 department: "Engineering",
                 email: "john.doe@example.com",

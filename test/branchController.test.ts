@@ -4,7 +4,7 @@ import { Branch } from "../src/data/branches";
 
 describe("Branch Controller", () => {
     
-    describe("getAllBranches", () => {
+    describe("GET /api/v1/branches", (): void => {
         test("should return 200 status and success message", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/branches");
@@ -29,7 +29,7 @@ describe("Branch Controller", () => {
         });
     });
 
-    describe("getBranchById", () => {
+    describe("getBranchById", (): void => {
         test("should return 200 status and success message for valid ID", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/branches/1");
@@ -49,7 +49,7 @@ describe("Branch Controller", () => {
         });
     });
 
-    describe("createBranch", () => {
+    describe("createBranch", (): void => {
         test("should return 201 status and success message for valid data", async (): Promise<void> => {
             const newBranch: Omit<Branch, "id"> = {
                 name: "Test Branch",
@@ -107,7 +107,7 @@ describe("Branch Controller", () => {
         });
     });
 
-    describe("updateBranch", () => {
+    describe("updateBranch", (): void => {
         let createdBranchId: number;
 
         beforeEach(async (): Promise<void> => {
@@ -155,7 +155,7 @@ describe("Branch Controller", () => {
         });
     });
 
-    describe("deleteBranch", () => {
+    describe("deleteBranch", (): void => {
         let createdBranchId: number;
 
         beforeEach(async (): Promise<void> => {

@@ -1,33 +1,33 @@
-import Joi from "joi";
+import Joi, { StringSchema, NumberSchema, ObjectSchema } from "joi";
 
-const name = Joi.string().trim().min(2).max(100).messages({
+const name: StringSchema = Joi.string().trim().min(2).max(100).messages({
 	"string.base": "Name must be a string",
 	"string.empty": "Name cannot be empty",
 	"string.min": "Name must be at least 2 characters",
 	"string.max": "Name must be at most 100 characters",
 });
 
-const position = Joi.string().trim().min(2).max(100).messages({
+const position: StringSchema = Joi.string().trim().min(2).max(100).messages({
 	"string.base": "Position must be a string",
 	"string.empty": "Position cannot be empty",
 	"string.min": "Position must be at least 2 characters",
 	"string.max": "Position must be at most 100 characters",
 });
 
-const department = Joi.string().trim().min(2).max(100).messages({
+const department: StringSchema = Joi.string().trim().min(2).max(100).messages({
 	"string.base": "Department must be a string",
 	"string.empty": "Department cannot be empty",
 	"string.min": "Department must be at least 2 characters",
 	"string.max": "Department must be at most 100 characters",
 });
 
-const email = Joi.string().trim().email({ tlds: { allow: false } }).messages({
+const email: StringSchema = Joi.string().trim().email({ tlds: { allow: false } }).messages({
 	"string.base": "Email must be a string",
 	"string.empty": "Email cannot be empty",
 	"string.email": "Email must be a valid email",
 });
 
-const phone = Joi.string()
+const phone: StringSchema = Joi.string()
 	.trim()
 	.pattern(/^[0-9\-+\s()]{7,20}$/)
 	.messages({
@@ -36,13 +36,36 @@ const phone = Joi.string()
 		"string.pattern.base": "Phone must be a valid phone number",
 	});
 
-const branchId = Joi.number().integer().positive().messages({
+const branchId: NumberSchema = Joi.number().integer().positive().messages({
 	"number.base": "branchId must be a number",
 	"number.integer": "branchId must be an integer",
 	"number.positive": "branchId must be a positive number",
 });
 
-export const employeeSchemas = {
+interface EmployeeSchemas {
+	list: Record<string, never>;
+	getById: {
+		params: ObjectSchema;
+	};
+	getByBranch: {
+		params: ObjectSchema;
+	};
+	getByDepartment: {
+		params: ObjectSchema;
+	};
+	create: {
+		body: ObjectSchema;
+	};
+	update: {
+		params: ObjectSchema;
+		body: ObjectSchema;
+	};
+	delete: {
+		params: ObjectSchema;
+	};
+}
+
+export const employeeSchemas: EmployeeSchemas = {
 	// GET /api/v1/employees
 	list: {},
 
@@ -114,5 +137,5 @@ export const employeeSchemas = {
 				}),
 			}),
 		},
-} as const;
+};
 

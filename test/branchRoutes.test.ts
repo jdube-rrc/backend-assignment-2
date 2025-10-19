@@ -2,7 +2,7 @@ import request, { Response } from "supertest";
 import app from "../src/app";
 import { Branch } from "../src/data/branches";
 
-describe("Branch Routes", () => {
+describe("Branch Routes", (): void => {
     
     test("GET /api/v1/branches should call getAllBranches controller", async (): Promise<void> => {
         const response: Response = await request(app)

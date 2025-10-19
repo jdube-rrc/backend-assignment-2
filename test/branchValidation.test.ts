@@ -1,10 +1,10 @@
 import request, { Response } from "supertest";
 import app from "../src/app";
 
-describe("Branch Validation Tests", () => {
-    describe("POST /api/v1/branches - Create Branch Validation", () => {
+describe("Branch Validation Tests", (): void => {
+    describe("POST /api/v1/branches - Create Branch Validation", (): void => {
         test("should accept valid branch data", async (): Promise<void> => {
-            const validBranch = {
+            const validBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345",
                 phone: "555-1234"
@@ -20,7 +20,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when name is missing", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { address: string; phone: string } = {
                 address: "123 Main Street, City, State 12345",
                 phone: "555-1234"
             };
@@ -34,7 +34,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when name is too short (< 2 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "D",
                 address: "123 Main Street, City, State 12345",
                 phone: "555-1234"
@@ -49,7 +49,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when name is too long (> 100 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "A".repeat(101),
                 address: "123 Main Street, City, State 12345",
                 phone: "555-1234"
@@ -64,7 +64,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when address is missing", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; phone: string } = {
                 name: "Downtown Branch",
                 phone: "555-1234"
             };
@@ -78,7 +78,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when address is too short (< 5 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123",
                 phone: "555-1234"
@@ -93,7 +93,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when address is too long (> 200 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "A".repeat(201),
                 phone: "555-1234"
@@ -108,7 +108,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when phone is missing", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345"
             };
@@ -122,7 +122,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when phone has invalid format", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345",
                 phone: "abc"
@@ -137,7 +137,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when phone is too short (< 7 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345",
                 phone: "123"
@@ -152,7 +152,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when phone is too long (> 20 characters)", async (): Promise<void> => {
-            const invalidBranch = {
+            const invalidBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345",
                 phone: "123456789012345678901"
@@ -167,7 +167,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should accept valid phone formats with special characters", async (): Promise<void> => {
-            const validBranch = {
+            const validBranch: { name: string; address: string; phone: string } = {
                 name: "Downtown Branch",
                 address: "123 Main Street, City, State 12345",
                 phone: "+1 (555) 123-4567"
@@ -181,7 +181,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should accept phone with international format", async (): Promise<void> => {
-            const validBranch = {
+            const validBranch: { name: string; address: string; phone: string } = {
                 name: "International Branch",
                 address: "456 Global Avenue",
                 phone: "+44 20 7946 0958"
@@ -195,7 +195,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should strip unknown fields from request body", async (): Promise<void> => {
-            const branchWithExtraFields = {
+            const branchWithExtraFields: { name: string; address: string; phone: string; unknownField: string; anotherUnknownField: string } = {
                 name: "Test Branch",
                 address: "789 Test Road",
                 phone: "555-5555",
@@ -212,7 +212,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should trim whitespace from name", async (): Promise<void> => {
-            const branchWithWhitespace = {
+            const branchWithWhitespace: { name: string; address: string; phone: string } = {
                 name: "  Trimmed Branch  ",
                 address: "123 Trim Street",
                 phone: "555-7777"
@@ -227,9 +227,9 @@ describe("Branch Validation Tests", () => {
         });
     });
 
-    describe("PUT /api/v1/branches/:id - Update Branch Validation", () => {
+    describe("PUT /api/v1/branches/:id - Update Branch Validation", (): void => {
         test("should accept valid partial branch data", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { name: string } = {
                 name: "Updated Branch Name"
             };
 
@@ -241,7 +241,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should accept updating only address", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { address: string } = {
                 address: "999 New Address Street"
             };
 
@@ -253,7 +253,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should accept updating only phone", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { phone: string } = {
                 phone: "555-9999"
             };
 
@@ -265,7 +265,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should accept updating all fields at once", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { name: string; address: string; phone: string } = {
                 name: "Completely New Name",
                 address: "777 Completely New Address",
                 phone: "555-8888"
@@ -279,7 +279,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when name is too short in update", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { name: string } = {
                 name: "A"
             };
 
@@ -292,7 +292,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when address is too short in update", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { address: string } = {
                 address: "123"
             };
 
@@ -305,7 +305,7 @@ describe("Branch Validation Tests", () => {
         });
 
         test("should reject when phone is invalid in update", async (): Promise<void> => {
-            const updateData = {
+            const updateData: { phone: string } = {
                 phone: "abc"
             };
 
@@ -326,7 +326,7 @@ describe("Branch Validation Tests", () => {
         });
     });
 
-    describe("GET /api/v1/branches/:id - Get Branch By ID Validation", () => {
+    describe("GET /api/v1/branches/:id - Get Branch By ID Validation", (): void => {
         test("should accept valid branch ID", async (): Promise<void> => {
             const response: Response = await request(app)
                 .get("/api/v1/branches/1");
@@ -345,10 +345,10 @@ describe("Branch Validation Tests", () => {
         });
     });
 
-    describe("DELETE /api/v1/branches/:id - Delete Branch Validation", () => {
+    describe("DELETE /api/v1/branches/:id - Delete Branch Validation", (): void => {
         test("should accept valid branch ID for deletion", async (): Promise<void> => {
             // First create a branch to delete
-            const newBranch = {
+            const newBranch: { name: string; address: string; phone: string } = {
                 name: "To Delete",
                 address: "123 Delete Street",
                 phone: "555-0000"

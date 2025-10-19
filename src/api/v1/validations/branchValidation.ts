@@ -1,20 +1,20 @@
-import Joi from "joi";
+import Joi, { StringSchema, ObjectSchema } from "joi";
 
-const name = Joi.string().trim().min(2).max(100).messages({
+const name: StringSchema = Joi.string().trim().min(2).max(100).messages({
 	"string.base": "Name must be a string",
 	"string.empty": "Name cannot be empty",
 	"string.min": "Name must be at least 2 characters",
 	"string.max": "Name must be at most 100 characters",
 });
 
-const address = Joi.string().trim().min(5).max(200).messages({
+const address: StringSchema = Joi.string().trim().min(5).max(200).messages({
 	"string.base": "Address must be a string",
 	"string.empty": "Address cannot be empty",
 	"string.min": "Address must be at least 5 characters",
 	"string.max": "Address must be at most 200 characters",
 });
 
-const phone = Joi.string()
+const phone: StringSchema = Joi.string()
 	.trim()
 	.pattern(/^[0-9\-+\s()]{7,20}$/)
 	.messages({
@@ -23,7 +23,24 @@ const phone = Joi.string()
 		"string.pattern.base": "Phone must be a valid phone number",
 	});
 
-export const branchSchemas = {
+interface BranchSchemas {
+	list: Record<string, never>;
+	getById: {
+		params: ObjectSchema;
+	};
+	create: {
+		body: ObjectSchema;
+	};
+	update: {
+		params: ObjectSchema;
+		body: ObjectSchema;
+	};
+	delete: {
+		params: ObjectSchema;
+	};
+}
+
+export const branchSchemas: BranchSchemas = {
 	// GET /api/v1/branches
 	list: {},
 
@@ -69,5 +86,5 @@ export const branchSchemas = {
 				}),
 			}),
 		},
-} as const;
+};
 

@@ -14,7 +14,7 @@ interface ApiResponse<T> {
  * Creates a success response object
  * @param data - The data to include in a response
  * @param message - A message providing additional information about the response
- * @returns
+ * @returns A standardized success response object
  */
 export const successResponse = <T>(
     data: T,
@@ -26,10 +26,10 @@ export const successResponse = <T>(
 });
 
 /**
- * Creates an error resposne object
+ * Creates an error response object
  * @param message - The error message
  * @param code - Optional error code for debugging
- * @returns
+ * @returns A standardized error response object
  */
 export const errorResponse = (
     message: string,

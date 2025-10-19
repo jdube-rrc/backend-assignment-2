@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
 import { Branch } from "../models/branchModel";
-import { successResponse, errorResponse } from "../models/responseModel";
+import { successResponse } from "../models/responseModel";
 import * as branchService from "../services/branchService";
 
 /**
