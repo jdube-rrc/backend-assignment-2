@@ -165,12 +165,19 @@ export const updateEmployee = async (
             throw new Error(`Employee with ID ${id} not found`);
         }
 
-        // Update the document
-        await firestoreRepo.updateDocument<Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">>>(
-            COLLECTION_NAME,
-            id.toString(),
-            employeeData
-        );
+        // Remove undefined fields to avoid Firestore update() errors
+        const sanitizedData: Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">> = Object.fromEntries(
+            Object.entries(employeeData).filter(([, value]) => value !== undefined)
+        ) as Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">>;
+
+        // Perform update only when we have at least one field to modify
+        if (Object.keys(sanitizedData).length > 0) {
+            await firestoreRepo.updateDocument<Partial<Pick<Employee, "name" | "position" | "department" | "email" | "phone" | "branchId">>>(
+                COLLECTION_NAME,
+                id.toString(),
+                sanitizedData
+            );
+        }
 
         // Retrieve and return updated employee
         const updatedDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(

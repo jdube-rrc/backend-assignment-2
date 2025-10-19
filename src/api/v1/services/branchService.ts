@@ -112,12 +112,20 @@ export const updateBranch = async (
             throw new Error(`Branch with ID ${id} not found`);
         }
 
-        // Update the document
-        await firestoreRepo.updateDocument<Partial<Pick<Branch, "name" | "address" | "phone">>>(
-            COLLECTION_NAME,
-            id.toString(),
-            branchData
-        );
+        // Remove undefined fields to avoid Firestore update() errors
+        const sanitizedData: Partial<Pick<Branch, "name" | "address" | "phone">> = Object.fromEntries(
+            Object.entries(branchData).filter(([, value]) => value !== undefined)
+        ) as Partial<Pick<Branch, "name" | "address" | "phone">>;
+
+        // If no fields provided (empty body), return current document unchanged
+        if (Object.keys(sanitizedData).length > 0) {
+            // Update the document
+            await firestoreRepo.updateDocument<Partial<Pick<Branch, "name" | "address" | "phone">>>(
+                COLLECTION_NAME,
+                id.toString(),
+                sanitizedData
+            );
+        }
 
         // Retrieve and return updated branch
         const updatedDoc: FirebaseFirestore.DocumentSnapshot | null = await firestoreRepo.getDocumentById(
